@@ -1,0 +1,61 @@
+{
+  "name": "John Doe",
+  "target_date": "2024-12-19",
+  "top_priorities_today": [
+    "Computer Vision Project",
+    "Deep Learning Homework",
+    "Exercise"
+  ],
+  "current_state": "At home",
+  "key_events": {
+    "event_1": {
+      "event_name": "Computer Vision Project",
+      "projected_begin_time": "18:00",
+      "projected_duration": "1 hour",
+      "projected_location": "home in front of the computer",
+      "projected_activity": "grab a coffee and sit down at the cafe to work on the project, first I want to figure out how update the LLM to take the current scene into account",
+      "projected_interruptions": "Traffic, prevent me to come back to the home",
+      "projected_solution": "Push the project to 30 minutes later and still keep the same work duration"
+    },
+    "event_2": {
+      "event_name": "Deep Learning Homework",
+      "projected_begin_time": "21:00",
+      "projected_duration": "2 hour",
+      "projected_location": "home in front of the computer",
+      "projected_activity": "After finished eating and have a break, I would like to go for a walk to clear up my mind, and then come back to work on the homework. For every 25 minutes I would like to take a short break to stretch my body and have a cup of coffee.",
+      "projected_interruptions": "Too tired after eating and having a break, I might fall asleep",
+      "projected_solution": "Do a Meditation for 10 minutes to clear up my mind, and embrace the spliness while start working for 30 minutes. If I am still too tired, then I can take a break or push the homework to tomorrow."
+    },
+    "event_3": {
+      "event_name": "",
+      "projected_begin_time": "",
+      "projected_duration": "",
+      "projected_location": "",
+      "projected_activity": "",
+      "projected_interruptions": "",
+      "projected_solution": ""
+    }
+  },
+  "Most expected event": "Playing PS5",
+  "Actitutde_for_today": "To stay positive and energetic!",
+  "user_history_today":{
+    "completed_tasks_percentage": 50,
+    "uncompleted_tasks": ["task1", "task2"]
+  },
+  "user_history_past_day": {
+    "completed_tasks_percentage": 50,
+    "uncompleted_tasks_types": ["task1", "None"]
+  },
+  "user_history_past_week": {
+    "completed_tasks_percentage": 50,
+    "uncompleted_tasks_types": ["task1", "None"]
+  },
+  "user_history_past_month": {
+    "completed_tasks_percentage": 50,
+    "uncompleted_tasks_types": ["task1", "None"]
+  },
+  "user_history_past_year": {
+    "completed_tasks_percentage": 50,
+    "uncompleted_tasks_types": ["task1", "None"]
+  }
+}

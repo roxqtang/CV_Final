@@ -1,100 +1,135 @@
-import cv2
-from extract import process_frame
-from understand import process_scene, add_text_panel, PANEL_HEIGHT
-from llm import process_llm, preprocess
-from user_info import get_user_info, update_user_state
+import os
+import openai
+import user_info
+import time
+from langchain.llms import OpenAI
+from langchain.agents import load_tools
+from langchain.agents import initialize_agent
+from dotenv import load_dotenv
 
-VIDEO_PATH = "/media/tang/Windows-Storage/HW/CV/Cv_Project/video1.mp4"
-OUTPUT_PATH = "/media/tang/Windows-Storage/HW/CV/Cv_Project/video2.mp4"
+load_dotenv()
 
-ANNOTATED_DURATION = 5   # 5s annotated
-CYCLE_DURATION = 10      # total cycle: 5s annotated, 5s original
+openai.api_key = os.getenv("OPENAI_API_KEY")
+CUR_TIME = time.strftime("%Y-%m-%d %H:%M")  
 
-cap = cv2.VideoCapture(VIDEO_PATH)
-fps = cap.get(cv2.CAP_PROP_FPS)
-if fps <= 0:
-    fps = 30.0
+def process_llm(collected_objects, final_context):
+    objects_detected = [obj['label'] for obj in collected_objects]
+    object_list = ", ".join(objects_detected) if objects_detected else "no objects detected"
+    top_priorities_today = user_info.get_user_top_priorities_today()
+    current_time = time.strftime("%Y-%m-%d %H:%M")
+    target_date = user_info.get_user_target_date()
+    current_state = user_info.get_user_current_state()
+    hobbies = user_info.get_user_hobbies()
+    preferences = user_info.get_user_preferences()
+    schedules = user_info.get_user_schedule()
+    
+    
+    # Pre-designed prompt
+    system_message = (
+        f"""
+        You are a helpful assistant that provides concise suggestions
+        basd on user's history and the current scene understanding.
+        You response will contain two parts: 1. suggestion 2. proposed update
+        For suggestion part, use natural smooth human-like language style.
+        For proposed update part,
+        If you see a mismatch between current_state and scene context, propose
+        an update using the following format. For example:
+        [update]: [current_state] walking on street
 
-width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-fourcc = cv2.VideoWriter_fourcc(*"mp4v")
-out = cv2.VideoWriter(OUTPUT_PATH, fourcc, fps, (width, height + PANEL_HEIGHT))
-frame_index = 0
+        Your proposed update should consider only the discrepancy between
+        user profile and what we saw the last 5s, not including your own suggestion.
+        """
+    )
+    
+    user_message = f"""
+User Profile:
+[current_state]: {current_state}
+[top_priorities_today]: {top_priorities_today}
+[preferences]: {preferences}
+[schedules]: {schedules}
 
-current_combined_text = ""
-was_in_annotated_period = False
+Here are what we saw the last 5s:
+Scene Context: {final_context}
+Detected Objects: {object_list}
 
-last_scene_time = -1.0
-collected_objects = []
-collected_contexts = []  # store captions (context) each second
+Given the user state and schedule, provide a suggestion relevant to the user's current situation no longer than 2 sentences.
+Keep the suggestion concise.
+Pay attention to the current time: {current_time} and the target date: {target_date} and event times:
+If you think the user_state should change based on current state, you can append an [update] line as described.
+Return only the suggestions and optional [update] line, no other info.
+"""
 
-user_profile = get_user_info()  # load user profile at start
-while True:
-    ret, frame = cap.read()
-    if not ret:
-        break
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_message.strip()}
+        ],
+        max_tokens=200,
+        temperature=0.7
+    )
+    llm_suggestion = response.choices[0].message.content.strip()
+    print(f"llm_suggestion: {llm_suggestion}")
+    llm_suggestion = postprocess(llm_suggestion)
+    return llm_suggestion
 
-    current_time = frame_index / fps
-    cycle_pos = current_time % CYCLE_DURATION
-    in_annotated_period = (cycle_pos < ANNOTATED_DURATION)
 
-    # exit the annotated period
-    if was_in_annotated_period and not in_annotated_period:
-        if collected_objects and collected_contexts:
-            # preprocess collected contexts
-            final_context = preprocess(collected_contexts)
+def preprocess(contexts):
+    all_context = "\n".join(contexts)
+    system_message = (
+        "You are a helpful assistant that summarizes the given context into a concise statement."
+    )
+    user_message = f"""
+Here are the context collected from past 5s, each for 1s:
 
-            # get LLM suggestion
-            # llm_suggestion = process_llm(collected_objects, final_context)
-            llm_suggestion = process_llm(collected_objects, collected_contexts)
-            current_combined_text = f"{llm_suggestion}"
+{all_context}
 
-            print(f"\nTime {current_time:.2f}s\n"
-                  f"Collected Objects: {collected_objects}\n"
-                  f"Collected Contexts (captions): {collected_contexts}\n"
-                  f"Final Context: {final_context}\n"
-                  f"LLM Suggestion: {llm_suggestion}\n")
+Please summarize the above context into one concise paragraph no longer than 100 words. Be brief and clear.
+"""
 
-        # clear
-        collected_objects.clear()
-        collected_contexts.clear()
-        last_scene_time = -1.0
+    response = openai.ChatCompletion.create(
+        model="gpt-4o-mini",
+        messages=[
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": user_message.strip()}
+        ],
+        max_tokens=200,
+        temperature=0.7
+    )
 
-    # enter the annotated period
-    if in_annotated_period and not was_in_annotated_period:
-        collected_objects.clear()
-        collected_contexts.clear()
-        last_scene_time = -1.0
+    summary = response.choices[0].message.content.strip()
+    return summary
 
-    if in_annotated_period:
-        detected_objects, ann_frame = process_frame(frame)
-        scene_context = process_scene(frame)  # added line
+def postprocess(llm_output):
 
-        # collect unique objects
-        for obj in detected_objects:
-            label = obj['label']
-            if label not in [o['label'] for o in collected_objects]:
-                collected_objects.append(obj)
+    lines = llm_output.split("\n")
+    suggestion_lines = []
+    update_line = None
 
-        # if 1s has passed since last scene processing
-        if last_scene_time < 0 or (current_time - last_scene_time) >= 1.0:
-            caption = process_scene(ann_frame)
-            collected_contexts.append(caption)
-            last_scene_time = current_time
+    for line in lines:
+        line_stripped = line.strip()
+        if line_stripped.startswith("[update]:"):
+            update_line = line_stripped
+            # no need to add to suggestion_lines
         else:
-            pass
+            suggestion_lines.append(line)
 
-        # no LLM suggestion
-        final_frame = add_text_panel(ann_frame, current_combined_text)
-        out.write(final_frame)
-    else:
-        # show last LLM suggestion
-        final_frame = add_text_panel(frame, current_combined_text)
-        out.write(final_frame)
+    # update if found
+    if update_line:
+        update_info = update_line.replace("[update]:", "").strip()
+        if update_info.startswith("[") and "]" in update_info:
+            closing_bracket_idx = update_info.index("]")
+            field = update_info[1:closing_bracket_idx]
+            new_value = update_info[closing_bracket_idx+1:].strip()
 
-    was_in_annotated_period = in_annotated_period
-    frame_index += 1
+            # check "current_state" field
+            if field == "current_state":
+                user_info.update_user_state(new_value)
+            # possible more fields
 
-cap.release()
-out.release()
-print("Finished. Output saved at:", OUTPUT_PATH)
+    suggestion_text = "\n".join(suggestion_lines).strip()
+<<<<<<< HEAD
+    return suggestion_text
+=======
+    return suggestion_text
+>>>>>>> origin/main
