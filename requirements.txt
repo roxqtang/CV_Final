@@ -1,0 +1,10 @@
+av
+torch
+torchvision
+streamlit
+opencv-python-headless
+transformers
+openai==0.28.1
+timm
+langchain
+langchain_community

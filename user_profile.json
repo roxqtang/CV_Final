@@ -6,12 +6,23 @@
     "Deep Learning Homework",
     "Exercise"
   ],
+  "conservative_goals": {
+    "Computer Vision Project": "Complete LangChain integration and test with basic prompts",
+    "Deep Learning Homework": "Solve 2 problems from the assignment",
+    "Exercise": "30 minutes of cardio"
+  },
+  "ambitious_goals": {
+    "Computer Vision Project": "Finish LangChain integration, research 3 papers on scene understanding, implement basic scene analysis", 
+    "Deep Learning Homework": "Complete all 5 homework problems with extra credit",
+    "Exercise": "1 hour mixed workout: 30 min cardio + 30 min strength training"
+  },
+  
   "current_state": "At home",
   "key_events": {
     "event_1": {
       "event_name": "Computer Vision Project",
       "projected_begin_time": "18:00",
-      "projected_duration": "1 hour",
+      "projected_dur_mintues": "60:00",
       "projected_location": "home in front of the computer",
       "projected_activity": "grab a coffee and sit down at the cafe to work on the project, first I want to figure out how update the LLM to take the current scene into account",
       "projected_interruptions": "Traffic, prevent me to come back to the home",
@@ -20,7 +31,7 @@
     "event_2": {
       "event_name": "Deep Learning Homework",
       "projected_begin_time": "21:00",
-      "projected_duration": "2 hour",
+      "projected_dur_mintues": "120:30",
       "projected_location": "home in front of the computer",
       "projected_activity": "After finished eating and have a break, I would like to go for a walk to clear up my mind, and then come back to work on the homework. For every 25 minutes I would like to take a short break to stretch my body and have a cup of coffee.",
       "projected_interruptions": "Too tired after eating and having a break, I might fall asleep",
@@ -29,7 +40,7 @@
     "event_3": {
       "event_name": "",
       "projected_begin_time": "",
-      "projected_duration": "",
+      "projected_dur_mintues": "",
       "projected_location": "",
       "projected_activity": "",
       "projected_interruptions": "",
@@ -40,22 +51,22 @@
   "Actitutde_for_today": "To stay positive and energetic!",
   "user_history_today":{
     "completed_tasks_percentage": 50,
-    "uncompleted_tasks": ["task1", "task2"]
+    "completed_tasks_ids": ["1", "2"]
   },
   "user_history_past_day": {
     "completed_tasks_percentage": 50,
-    "uncompleted_tasks_types": ["task1", "None"]
+    "completed_tasks_ids": ["1", "2"]
   },
   "user_history_past_week": {
     "completed_tasks_percentage": 50,
-    "uncompleted_tasks_types": ["task1", "None"]
+    "completed_tasks_ids": ["1", "2"]
   },
   "user_history_past_month": {
     "completed_tasks_percentage": 50,
-    "uncompleted_tasks_types": ["task1", "None"]
+    "completed_tasks_ids": ["1", "2"]
   },
   "user_history_past_year": {
     "completed_tasks_percentage": 50,
-    "uncompleted_tasks_types": ["task1", "None"]
+    "completed_tasks_ids": ["1", "2"]
   }
 }

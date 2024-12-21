@@ -1,0 +1,35 @@
+# Python
+_pycache__/
+.py[cod]
+$py.class
+.so
+Python
+nv/
+uild/
+evelop-eggs/
+ist/
+ownloads/
+ggs/
+eggs/
+ib/
+ib64/
+arts/
+dist/
+ar/
+.egg-info/
+installed.cfg
+.egg
+# Virtual Environment
+env/
+NV/
+env
+# IDE
+idea/
+vscode/
+.swp
+.swo
+# Video files
+.mp4
+.avi
+.mov
+.env
