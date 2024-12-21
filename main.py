@@ -4,8 +4,8 @@ from understand import process_scene, add_text_panel, PANEL_HEIGHT
 from llm import process_llm, preprocess
 from user_info import get_user_info, update_user_state
 
-VIDEO_PATH = "/media/tang/Windows-Storage/HW/CV/Cv_Project/video1.mp4"
-OUTPUT_PATH = "/media/tang/Windows-Storage/HW/CV/Cv_Project/video2.mp4"
+VIDEO_PATH = r"E:\HW\CV\Cv_Project\video1.mp4"
+OUTPUT_PATH = r"E:\HW\CV\Cv_Project\video2.mp4"
 
 ANNOTATED_DURATION = 5   # 5s annotated
 CYCLE_DURATION = 10      # total cycle: 5s annotated, 5s original
